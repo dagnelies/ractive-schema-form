@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset='utf-8'>
+	<title>Schema-form plugin for Ractive.js</title>
+	
+	<!-- JQuery -->
+	<script src="libs/jquery/jquery-1.11.1.min.js"></script>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="libs/bootstrap/css/bootstrap-theme.min.css" />
+	<script src="libs/bootstrap/js/bootstrap.min.js"></script>
+
+	<!-- Code Mirror -->
+	<link rel="stylesheet" href="libs/codemirror/codemirror.css">
+	<script src="libs/codemirror/codemirror-html.js"></script>
+	
+	<!-- Ractive -->
+	<script src='libs/ractive/ractive.js'></script> 
+	<script src="libs/ractive/ractive-codemirror.min.js"></script>
+	<script src='libs/ractive/ractive-bootstrap.min.js'></script>
+	<script src='libs/ractive/ractive-array.min.js'></script>
+	<script src='https://raw.github.com/ractivejs/ractive-transitions-fade/master/dist/ractive-transitions-fade.js'></script>
+	
+	<!-- This plugin -->
+	<script src='src/ractive-schema-form.js'></script>
+	
+	<!-- Demo page -->
+	<link href='http://fonts.googleapis.com/css?family=Voltaire' rel='stylesheet' type='text/css' />
+	<link rel="stylesheet" href="style.css" />
+	
+	<style>
+		.btn-group {
+			margin: -5px -11px;
+		}
+	</style>
+</head>
+<body>
+	<script id="template" type="ractive">
+		<a href="https://github.com/dagnelies/ractive-schema-form"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/c6625ac1f3ee0a12250227cf83ce904423abf351/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png"></a>
+		
+		<header>
+			<h1>Schema-form plugin for Ractive.js</h1>
+			
+		</header>
+		
+		<container>
+			<h3>What is it?</h3>
+			
+			<p>A "Schema Form" takes a JSON Schema and build a form out of it and taking care of the two-way data binding.</p>
+			<img src="https://camo.githubusercontent.com/1d51dc68a789839e809d7546692359305dd726e8/68747470733a2f2f7261772e6769746875622e636f6d2f6a646f726e2f6a736f6e2d656469746f722f6d61737465722f6a736f6e656469746f722e706e67" />
+			
+			<h3>How do I use it?</h3>
+			
+			<p>First, you'll also need following dependencies:</p>
+			<ul>
+				<li>Bootstrap: currently, the forms are built in bootstrap style only.</li>
+				<li>JQuery: a bootstrap dependency by itself, but also used to fetch the json schema.</li>
+				<li><a href="http://dagnelies.github.io/ractive-array">Ractive Arrays Plugin</a></li>
+				<li><a href="http://ractivejs.github.io/ractive-transitions-fade">Ractive Fade Plugin</a></li>
+			</ul>
+			
+			<p>Then, you'll need the plugin itself:</p>
+			<ul>
+				<li>Debug: <a href='ractive-schema-form.js'>ractive-schema-form.js</a></li>
+				<li>Minified: <a href='ractive-schema-form.min.js'>ractive-schema-form.min.js</a></li>
+			</ul>
+			
+			<p>Once you get the required stuff, you can use it with a one liner like: <code>&lt;schema-form url="http://.../myschema.json" data="\{{.form_data}}" /&gt;</code> 
+			and it will keep a bi-directional data-binding with <code>.form_data</code></p>
+			<p>You can also invoke <code>Ractive.buildSchemaTemplate(schema)</code> to obtain one big HTML string representing the form.</p>
+			
+			
+			<h3>Limitations</h3>
+			
+			<p>This is a no-frills plugin, initially developed for my own purpose.
+			Due to the complexity of JSON schemas and possible customization of forms, its too much work to make a full-fledged plugin that supports everything.
+			Therefore, <i>this code is delivered as is</i> and not actively maintained. Feel free to contribute.</p>
+			
+			<p>Known Limitations:</p>
+			<ul>
+				<li>Only "flat" schemas. No remote/nested/recursive schemas resolution.</li>
+				<li>Fields with multiple types are defaulting to strings.</li>
+				<li>Only basics. <code>oneOf</code>, <code>anyOf</code> and <code>allOf</code> are not supported.</li>
+				<li>Only properties with "normal" ids <code>[A-Za-z0-9_]</code> and no keywords.</li>
+				<li>No validation.</li>
+				<li>No <code>additionalProperties</code>.</li>
+				<li>No default values.</li>
+			</ul>
+		
+			<h3>See it in action</h3>
+		
+			<p class="form-inline">
+				Schema: 
+				<select class="form-control" value="{{.selected}}" onchange="loadSchema(this.value)">
+					<option></option>
+					{{#each schemas}}
+					<option value="{{.url}}">{{.name}}</option>
+					{{/each}}
+				</select>
+				{{#if .selected}}
+					<a href="{{.selected}}"><icon-link /> {{.selected}}</a>
+				{{/if}}
+			</p>
+			
+			<row>
+				<col-md-6>
+					<codemirror value="{{.schema}}" mode="json" />
+				</col-md-6>
+				<col-md-6>
+					<schema-form schema="{{JSON.parse(.schema)}}" data="{{.form_data}}" />
+					{{#if .form_data}}<pre>{{JSON.stringify(.form_data, null, 2)}}</pre>{{/if}}
+					<div id="example">
+					</div>
+				</col-md-6>
+			</row>
+			
+			{{#if .form}}
+				Generated Form:
+				<pre>{{.form}}</pre>
+			{{/if}}
+		</container>
+		<hr/>
+		<footer>
+			<p>Copyright © 2015 Arnaud Dagnelies. Licensed MIT</p>
+		</footer>
+	</script>
+	<script>
+		var example = null
+		
+		var ractive = new Ractive({
+			el: 'body',
+			template: '#template',
+			data: {
+				schema: ''
+			}
+		});
+		
+		$.ajax({
+			url: "http://schemastore.org/api/json/catalog.json",
+			dataType: "json",
+			success: function(res) {
+				ractive.set('schemas', res.schemas)
+			},
+			error: function() {
+				alert("Failed to load JSON catalog from http://schemastore.org")
+			}
+		})
+		
+		function loadSchema(url) {
+			console.log(url)
+			$.ajax({
+				url: url,
+				dataType: "json",
+				success: function(res) {
+					//console.log(JSON.stringify(res, null, 2))
+					ractive.set('schema', JSON.stringify(res, null, 2))
+					var template = Ractive.buildSchemaTemplate(res)
+					ractive.set('form', template)
+					/*
+					if( example )
+						example.teardown()
+					example = new Ractive({
+						el: "#example",
+						template: template
+					})
+					*/
+				},
+				error: function(xhr,err,msg) {
+					console.log(xhr)
+					alert("Failed to load schema: " + err + " (" + msg + ")")
+				}
+			})
+		}
+		
+	</script>
+  
+</body>
+</html>
+
